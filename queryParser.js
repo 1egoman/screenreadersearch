@@ -96,6 +96,7 @@ function matchPortion(dict, query, matches, nonMatches) {
 }
 
 module.exports = {
+  tokenize,
   synonymize,
   matchPortion,
 }

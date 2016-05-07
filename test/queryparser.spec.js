@@ -6,6 +6,12 @@ const qp = require("../queryParser"),
 
 describe("queryParser", function() {
 
+  describe("tokenize", function() {
+    it("should tokenize a sentence", function() {
+      assert.deepEqual(qp.tokenize("foo bar baz"), ["foo", "bar", "baz"]);
+    });
+  });
+
   describe("synonymize", function() {
     let fooSynonyms = ["foo", "synonyms"];
     let barSynonyms = ["bar", "synonyms"];
