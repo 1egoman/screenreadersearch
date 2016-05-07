@@ -39,6 +39,17 @@ describe("editablepicker", function() {
         [{role: "button", label: "", content: "", state: undefined}]
       );
     });
+    it("should try to get label from id", function() {
+      assert.deepEqual(
+        ep(`<div
+          id="percent-loaded"
+          role="button"
+        />`),
+        [{
+          role: "button", label: "percent loaded", content: "", state: undefined,
+        }]
+      );
+    });
   });
 
   describe("buttons", function() {
@@ -96,6 +107,18 @@ describe("editablepicker", function() {
             minValue: 0,
             value: 75,
           },
+        }]
+      );
+    });
+    it("should try get data for an unhelpful progressbar", function() {
+      assert.deepEqual(
+        ep(`<div
+          id="percent-loaded"
+          role="progressbar"
+          value="75"
+        />`),
+        [{
+          role: "progressbar", label: "percent loaded", content: "", state: 75,
         }]
       );
     });

@@ -64,7 +64,8 @@ module.exports = function editablePicker(layout) {
   function getNodeDescriptor(node) {
     let nodeContent = getNodeContents(node).join(" ").trim();
 
-    // fetch the label from either the contents 
+    // fetch the label from either the contents of a node.
+    // used with 'aria-labelledby' and friends.
     function getLabelFromContents(node) {
       let nodeReferencedLabel = getNodeContents(node[0]).join(" ").trim();
       if (nodeReferencedLabel.length > 0) {
@@ -114,7 +115,7 @@ module.exports = function editablePicker(layout) {
         };
       }
     } else {
-      return {nodeContent, label: getLabelFromId(node)};
+      return {nodeContent, label: getLabelFromId(node)}; // as a last resort, look for the label within the id
     }
   }
 
