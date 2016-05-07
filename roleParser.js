@@ -39,7 +39,9 @@ const selectors = {
   ],
 };
 
-module.exports = function editablePicker(layout) {
+// Input: a html string
+// Output: a list of actionable elements with their relevant labels.
+module.exports = function roleParser(layout) {
   let $ = require("cheerio").load(layout);
   let labels = [];
 
