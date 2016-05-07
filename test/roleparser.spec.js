@@ -1,8 +1,8 @@
 "use strict";
-let ep = require("../server"),
+let ep = require("../roleParser"),
     assert = require("assert");
 
-describe("editablepicker", function() {
+describe("roleParser", function() {
   this.slow(250);
 
   describe("labels", function() {

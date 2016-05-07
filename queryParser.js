@@ -4,7 +4,7 @@ const natural = require("natural"),
       Synonymator = require("synonymator"),
       syn = new Synonymator("a6f9d60ad0261cd2a8e3fc07ee54cd4c");
 
-let input = "create new item";
+let query = "create new item";
 
 // Step 1: tokenize the input
 function tokenize(input) {
@@ -50,7 +50,7 @@ function synonymize(posInput) {
 
     // format the returned types
     function format(types) {
-      return types.syn;
+      return [...types.syn, word];
     }
     
     return syn.lookup(word)
@@ -72,10 +72,39 @@ function synonymize(posInput) {
   return Promise.all(words);
 }
 
-let a = tokenize(input);
-classify(a)
-.then(synonymize)
-.then(b => {
-  console.log(b)
-})
-.catch(e => { console.error(e) });
+// function doesStringMatchQuery(dict, query) {
+// Step 4: does the given string match a query or its synonyms?
+// We want to see if a given list of word synonyms matches up with a search
+// query. So, for each word, check if it is contained in the query. Return a
+// fraction of the amount of words contained over the total amount of words
+// present.
+// ex: matchPortion([["foo", "bar", "baz"]], "foo hello") returns 1/2
+// ex: matchPortion([["foo", "bar", "baz"]], "foo hello world") returns 1/3
+function matchPortion(dict, query, matches, nonMatches) {
+  matches = matches || 0; nonMatches = nonMatches || 0;
+  if (dict.length === 0 && matches === 0 && nonMatches === 0) {
+    // the first iteration was empty, so we cannot do anything
+    return 0;
+  } else if (dict.length === 0) {
+    // we're done - compute percentage of match
+    return matches / (nonMatches + matches);
+  } else if (dict[0].some(i => query.indexOf(i) >= 0)) { // match found
+    return matchPortion(dict.slice(1), query, ++matches, nonMatches);
+  } else { // no match found
+    return matchPortion(dict.slice(1), query, matches, ++nonMatches);
+  }
+}
+
+module.exports = {
+  synonymize,
+  matchPortion,
+}
+//
+// let a = tokenize(query);
+// classify(a)
+// .then(synonymize)
+// .then(words => {
+//   console.info("Synonyms for words", words)
+//   console.log(matchPortion(words, "add new"))
+// })
+// .catch(e => { console.error(e) });
