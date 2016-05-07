@@ -1,10 +1,20 @@
 "use strict";
 let layout = `
+<!-- button -->
 <div role="button" aria-label="My Button Label" class="btn btn-primary">
   <i class="fa fa-user" />
   My Button Text
 </div>
-<div role="checkbox" aria-label="my label"></div>
+
+<!-- checkbox -->
+<div role="checkbox" aria-checked="true" aria-label="my check label"></div>
+
+<!-- textbox -->
+<div role="textbox" value="data" aria-label="my text label"></div>
+<div role="textbox" aria-multiline="true" aria-label="my text multiline label">
+  data
+  multiline
+</div>
 `;
 
 let $ = require("cheerio").load(layout);
@@ -64,22 +74,61 @@ function getNodeDescriptor(node) {
   }
 }
 
-// find all labels
-let data = $("[role]").toArray().map(node => {
-  // get the text associated with a node
-  let content = getNodeDescriptor(node);
+// return the active state of a node. ie, is a checkbox checked?
+function getNodeState(node) {
+  let attr = node.attribs;
+  return attr.checked ||
+         attr.value ||
+         attr["aria-pressed"] ||
+         attr["aria-checked"] ||
+         attr["aria-selected"];
+}
 
-  // return each node's data
-  return {
-    role: node.attribs.role,
-    label: (function(content) {
-      return content.label ||
-             content.nodeContent;
-    })(content),
+
+let selectors = {
+  button: [
+    ".btn", ".button",
+    "[role=button]",
+    "button",
+    "input[type=submit]", "input[type=button]",
+  ],
+  checkbox: [
+    "[role=checkbox]",
+    "input[type=checkbox]",
+  ],
+  textbox: [
+    "[role=textbox]",
+    "input[type=text]",
+  ],
+}, data = [];
+
+
+// for each role, try and find matches
+for (let role in selectors) {
+  if (selectors.hasOwnProperty(role)) {
+    let selector = selectors[role].join(", ");
+    let output = $(selector).toArray().map(node => {
+      // get the text associated with a node
+      let content = getNodeDescriptor(node);
+
+      // return each node's data
+      return {
+        role, // the input type
+
+        // the text label for the element
+        label: content.label || content.nodeContent,
+
+        // the present condition of te element
+        state: getNodeState(node) || content.nodeContent, 
+      };
+    });
+
+    data = [...data, ...output];
   }
-});
+}
 
 console.log(data)
+
 /*
  * Buttons: Click them to see what happens
  *
