@@ -61,4 +61,43 @@ describe("editablepicker", function() {
       );
     });
   });
+  describe("progressbars", function() {
+    it("should detect role=progressbar", function() {
+      assert.deepEqual(
+        ep(`<div
+          id="percent-loaded"
+          aria-label="my progressbar"
+          role="progressbar"
+          aria-valuenow="75"
+          aria-valuemin="0"
+          aria-valuemax="100"
+        />`),
+        [{
+          role: "progressbar", label: "my progressbar", content: "", state: {
+            maxValue: 100,
+            minValue: 0,
+            value: 75,
+          },
+        }]
+      );
+    });
+    it("should try to get label from id for progressbar", function() {
+      assert.deepEqual(
+        ep(`<div
+          id="percent-loaded"
+          role="progressbar"
+          aria-valuenow="75"
+          aria-valuemin="0"
+          aria-valuemax="100"
+        />`),
+        [{
+          role: "progressbar", label: "percent loaded", content: "", state: {
+            maxValue: 100,
+            minValue: 0,
+            value: 75,
+          },
+        }]
+      );
+    });
+  });
 });

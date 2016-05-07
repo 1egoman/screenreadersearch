@@ -33,6 +33,10 @@ const selectors = {
     "[role=textbox]",
     "input[type=text]",
   ],
+  progressbar: [
+    "[role=progressbar]",
+    "input[type=text]",
+  ],
 };
 
 module.exports = function editablePicker(layout) {
@@ -60,6 +64,29 @@ module.exports = function editablePicker(layout) {
   function getNodeDescriptor(node) {
     let nodeContent = getNodeContents(node).join(" ").trim();
 
+    // fetch the label from either the contents 
+    function getLabelFromContents(node) {
+      let nodeReferencedLabel = getNodeContents(node[0]).join(" ").trim();
+      if (nodeReferencedLabel.length > 0) {
+        return nodeReferencedLabel;
+      } else {
+        return getLabelFromId(node);
+      }
+    }
+
+    // try to split the id with punctuation to make a more human readable
+    // form.
+    function getLabelFromId(node) {
+      if (node.attribs.id) {
+        return node.attribs["id"]
+        .split(/[!#$%&()*+, \-./:;<=>?@ \\\^_`{|}~]/)
+        .filter(c => c.trim().length > 0)
+        .join(" ");
+      } else {
+        return null;
+      }
+    }
+
     // a normal label
     if (node.attribs["aria-label"]) {
       return {
@@ -75,9 +102,7 @@ module.exports = function editablePicker(layout) {
         return {
           type: "aria-labelledby",
           nodeContent,
-          label: getNodeContents(labelledNode[0])
-                 .join(" ")
-                 .trim(),
+          label: getLabelFromContents(labelledNode),
           labelRef: node.attribs["aria-labelledby"], // the id of the element that contains
                                                      // this element's label
         };
@@ -89,18 +114,28 @@ module.exports = function editablePicker(layout) {
         };
       }
     } else {
-      return {nodeContent, label: null};
+      return {nodeContent, label: getLabelFromId(node)};
     }
   }
 
   // return the active state of a node. ie, is a checkbox checked?
   function getNodeState(node) {
     let attr = node.attribs;
-    return attr.checked ||
-           attr.value ||
-           attr["aria-pressed"] ||
-           attr["aria-checked"] ||
-           attr["aria-selected"];
+
+    // for a progressbar
+    if (attr["aria-valuenow"]) {
+      return {
+        value: attr["aria-valuenow"],
+        minValue: attr["aria-valuemin"],
+        maxValue: attr["aria-valuemax"],
+      };
+    } else {
+      return attr.checked ||
+             attr.value ||
+             attr["aria-pressed"] ||
+             attr["aria-checked"] ||
+             attr["aria-selected"];
+    }
   }
 
 
