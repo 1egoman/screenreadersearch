@@ -62,11 +62,11 @@ function synonymize(posInput) {
         case 'VB': return format(data.verb);
         case 'JJ': return format(data.adjective);
         default:
-          return format([
-            ...data.noun,
-            ...data.verb,
-            ...data.adjective,
-          ]);
+          return format({syn: [
+            ...(data.noun ? data.noun.syn : []),
+            ...(data.verb ? data.verb.syn : []),
+            ...(data.adjective ? data.adjective.syn : []),
+          ]});
       }
     });
   });

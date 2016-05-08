@@ -23,11 +23,11 @@ describe("queryParser", function() {
       lookup.withArgs("foo").resolves({noun: {syn: fooSynonyms}});
       lookup.withArgs("bar").resolves({
         verb: {syn: barSynonyms},
-        noun: {syn: ["bad", "stuff"]},
+        noun: {syn: ["verb", "stuff"]},
       });
       lookup.withArgs("baz").resolves({
         adjective: {syn: bazSynonyms},
-        noun: {syn: ["bad", "stuff"]},
+        noun: {syn: ["noun", "stuff"]},
       });
     });
     afterEach(() => {
@@ -45,6 +45,13 @@ describe("queryParser", function() {
           [...fooSynonyms, "foo"], // noun
           [...barSynonyms, "bar"], // verb
           [...bazSynonyms, "baz"], // adjective
+        ]);
+      });
+    });
+    it("should work with words with no pos", function() {
+      return qp.synonymize([["bar", "bogus"]]).then(synonyms => {
+        assert.deepEqual(synonyms, [
+          ["verb", "stuff", ...barSynonyms, "bar"],
         ]);
       });
     });
