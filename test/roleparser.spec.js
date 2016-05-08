@@ -19,12 +19,28 @@ describe("roleParser", function() {
         [{role: "button", label: "my button label", content: "", state: undefined}]
       );
     });
+    it("should pull from aria-labelledby with nested label contents in another element", function() {
+      assert.deepEqual(
+        ep(`<div id="my-element">
+            my button<span>label</span>
+          </div>
+            <div role="button" aria-labelledby="my-element"></div>`),
+        [{role: "button", label: "my button label", content: "", state: undefined}]
+      );
+    });
     it("should use the first element with aria-labelledby when there's collisions", function() {
       assert.deepEqual(
         ep(`<div id="my-element">my button label</div>
             <div id="my-element">another label</div>
             <div role="button" aria-labelledby="my-element"></div>`),
         [{role: "button", label: "my button label", content: "", state: undefined}]
+      );
+    });
+    it("should pull from id in absence of aria-labelled", function() {
+      assert.deepEqual(
+        ep(`<div id="my-element"></div>
+            <div role="button" aria-labelledby="my-element"></div>`),
+        [{role: "button", label: "my element", content: "", state: undefined}]
       );
     });
     it("should fail gracefully when a label doesn't exist", function() {
@@ -44,7 +60,7 @@ describe("roleParser", function() {
         ep(`<div
           id="percent-loaded"
           role="button"
-        />`),
+        ></div>`),
         [{
           role: "button", label: "percent loaded", content: "", state: undefined,
         }]

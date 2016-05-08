@@ -72,7 +72,7 @@ module.exports = function roleParser(layout) {
       if (nodeReferencedLabel.length > 0) {
         return nodeReferencedLabel;
       } else {
-        return getLabelFromId(node);
+        return getLabelFromId(node[0]);
       }
     }
 
@@ -80,7 +80,7 @@ module.exports = function roleParser(layout) {
     // form.
     function getLabelFromId(node) {
       if (node.attribs.id) {
-        return node.attribs["id"]
+        return node.attribs.id
         .split(/[!#$%&()*+, \-./:;<=>?@ \\\^_`{|}~]/)
         .filter(c => c.trim().length > 0)
         .join(" ");
