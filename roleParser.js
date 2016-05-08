@@ -35,7 +35,6 @@ const selectors = {
   ],
   progressbar: [
     "[role=progressbar]",
-    "input[type=text]",
   ],
 };
 

@@ -56,7 +56,9 @@ function synonymize(posInput) {
     return syn.lookup(word)
     .then(data => {
       switch (pos) {
-        case 'NN': return format(data.noun);
+        case 'NN':
+        case 'N':
+          return format(data.noun);
         case 'VB': return format(data.verb);
         case 'JJ': return format(data.adjective);
         default:
