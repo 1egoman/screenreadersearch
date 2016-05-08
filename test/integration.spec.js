@@ -23,6 +23,13 @@ function fillInRole(data) {
 describe("integration", function() {
   this.slow(500);
 
+  let consoleinfo;
+  before(() => {
+    consoleinfo = console.info;
+    console.info = function() {};
+  });
+  after(() => console.info = consoleinfo);
+
   describe("google", function() {
     let googleHTML;
     before(() => googleHTML = getHTMLCase("google"));
@@ -103,8 +110,7 @@ describe("integration", function() {
     // stub the synonyms
     beforeEach(() => {
       let lookup = sinon.stub(Synonymator.prototype, "lookup");
-      lookup.withArgs("tweet").resolves({noun: {syn: ["post", "item"]}});
-      lookup.withArgs("search").resolves({noun: {syn: ["search"]}});
+      lookup.withArgs("tweet").resolves({noun: {syn: []}});
       lookup.withArgs("create").resolves({verb: {syn: ["make", "new"]}});
       lookup.rejects("Bad query synonym word");
     });
@@ -113,14 +119,51 @@ describe("integration", function() {
     });
 
     it("create tweet", function() {
-      console.info = function() {}
       return algorithm(twitterHTML, "create tweet").then(out => {
-        console.log(out)
-        // assert.deepEqual(out, [fillInRole({
-        //   role: 'button',
-        //   label: 'Google Search',
-        //   state: 'Google Search'
-        // })]);
+        assert.deepEqual(out, [
+            { role: 'button',
+              roleParents: [ 'complementary' ],
+              content: 'Tweet',
+              label: 'global new tweet button',
+              state: undefined },
+
+            { role: 'button',
+              roleParents: [],
+              content: 'New Message',
+              label: 'New Message',
+              state: undefined
+            },
+            { role: 'button',
+              roleParents: [],
+              content: 'Remove Tweet attachment',
+              label: 'Remove Tweet attachment',
+              state: undefined
+            },
+            { role: 'button',
+              roleParents: [],
+              content: 'Next Tweet from user',
+              label: 'Next Tweet from user',
+              state: undefined
+            },
+            { role: 'checkbox',
+              roleParents: [],
+              content: '',
+              label: 'include parent tweet',
+              state: undefined
+            },
+            { role: 'textbox',
+              roleParents: [],
+              content: '',
+              label: 'Tweet text',
+              state: undefined 
+            },
+            { role: 'textbox',
+              roleParents: [],
+              content: '',
+              label: 'Tweet text',
+              state: undefined 
+            } 
+        ]);
       });
     });
   });

@@ -28,10 +28,13 @@ module.exports = function algorithm(pageContents, query) {
       if (a.roleParents.length && importantRoles.indexOf(a.roleParents[0]) !== -1) {
         rankedWeight *= 1.05;
       }
-      console.log("RANK", a.label, unrankedWeight, rankedWeight)
 
       return rankedWeight;
     });
+
+    // make all ranks relative to the highest rank.
+    let largestRank = ranks.reduce((largest, i) => i > largest ? i : largest, 0);
+    let relRanks = ranks.map(i => i / largestRank);
 
     // the best are above average
     // let avgRank = ranks.reduce((acc, i) => acc + i, 0) / ranks.length;
@@ -40,10 +43,15 @@ module.exports = function algorithm(pageContents, query) {
     // });
 
     // the best is the top one
-    let maxRank = ranks.reduce((large, i) => {
-      return i > large ? i : large;
-    }, 0)
-    let importantActions = [actions[ranks.indexOf(maxRank)]];
+    // let maxRank = ranks.reduce((large, i) => {
+    //   return i > large ? i : large;
+    // }, 0)
+    // let importantActions = [actions[ranks.indexOf(maxRank)]];
+
+    // pick the top percentage of the relative ranked scores
+    let importantActions = actions.filter((b, ct) => {
+      return relRanks[ct] > 0.5;
+    });
 
     return importantActions;
   })
