@@ -9,14 +9,14 @@ describe("roleParser", function() {
     it("should pull from aria-label", function() {
       assert.deepEqual(
         ep(`<div role="button" aria-label="my button label"></div>`),
-        [{role: "button", label: "my button label", content: "", state: undefined}]
+        [{roleParents: [], role: "button", label: "my button label", content: "", state: undefined}]
       );
     });
     it("should pull from aria-labelledby", function() {
       assert.deepEqual(
         ep(`<div id="my-element">my button label</div>
             <div role="button" aria-labelledby="my-element"></div>`),
-        [{role: "button", label: "my button label", content: "", state: undefined}]
+        [{roleParents: [], role: "button", label: "my button label", content: "", state: undefined}]
       );
     });
     it("should pull from aria-labelledby with nested label contents in another element", function() {
@@ -25,7 +25,7 @@ describe("roleParser", function() {
             my button<span>label</span>
           </div>
             <div role="button" aria-labelledby="my-element"></div>`),
-        [{role: "button", label: "my button label", content: "", state: undefined}]
+        [{roleParents: [], role: "button", label: "my button label", content: "", state: undefined}]
       );
     });
     it("should use the first element with aria-labelledby when there's collisions", function() {
@@ -33,26 +33,26 @@ describe("roleParser", function() {
         ep(`<div id="my-element">my button label</div>
             <div id="my-element">another label</div>
             <div role="button" aria-labelledby="my-element"></div>`),
-        [{role: "button", label: "my button label", content: "", state: undefined}]
+        [{roleParents: [], role: "button", label: "my button label", content: "", state: undefined}]
       );
     });
     it("should pull from id in absence of aria-labelled", function() {
       assert.deepEqual(
         ep(`<div id="my-element"></div>
             <div role="button" aria-labelledby="my-element"></div>`),
-        [{role: "button", label: "my element", content: "", state: undefined}]
+        [{roleParents: [], role: "button", label: "my element", content: "", state: undefined}]
       );
     });
     it("should fail gracefully when a label doesn't exist", function() {
       assert.deepEqual(
         ep(`<div role="button" aria-labelledby="no-exist"></div>`),
-        [{role: "button", label: "", content: "", state: undefined}]
+        [{roleParents: [], role: "button", label: "", content: "", state: undefined}]
       );
     });
     it("should fail gracefully without any label", function() {
       assert.deepEqual(
         ep(`<div role="button"></div>`),
-        [{role: "button", label: "", content: "", state: undefined}]
+        [{roleParents: [], role: "button", label: "", content: "", state: undefined}]
       );
     });
     it("should try to get label from id", function() {
@@ -61,7 +61,7 @@ describe("roleParser", function() {
           id="percent-loaded"
           role="button"
         ></div>`),
-        [{
+        [{roleParents: [],
           role: "button", label: "percent loaded", content: "", state: undefined,
         }]
       );
@@ -72,19 +72,19 @@ describe("roleParser", function() {
     it("should detect role=button", function() {
       assert.deepEqual(
         ep(`<div role="button" aria-label="my button label">my content</div>`),
-        [{role: "button", label: "my button label", content: "my content", state: undefined}]
+        [{roleParents: [], role: "button", label: "my button label", content: "my content", state: undefined}]
       );
     });
     it("should detect button element", function() {
       assert.deepEqual(
         ep(`<button aria-label="my button label">my content</button>`),
-        [{role: "button", label: "my button label", content: "my content", state: undefined}]
+        [{roleParents: [], role: "button", label: "my button label", content: "my content", state: undefined}]
       );
     });
     it("should detect input[type=submit]", function() {
       assert.deepEqual(
         ep(`<input type="submit" aria-label="my button label" />`),
-        [{role: "button", label: "my button label", content: "", state: undefined}]
+        [{roleParents: [], role: "button", label: "my button label", content: "", state: undefined}]
       );
     });
   });
@@ -99,7 +99,7 @@ describe("roleParser", function() {
           aria-valuemin="0"
           aria-valuemax="100"
         />`),
-        [{
+        [{roleParents: [],
           role: "progressbar", label: "my progressbar", content: "", state: {
             maxValue: 100,
             minValue: 0,
@@ -117,7 +117,7 @@ describe("roleParser", function() {
           aria-valuemin="0"
           aria-valuemax="100"
         />`),
-        [{
+        [{roleParents: [],
           role: "progressbar", label: "percent loaded", content: "", state: {
             maxValue: 100,
             minValue: 0,
@@ -133,7 +133,7 @@ describe("roleParser", function() {
           role="progressbar"
           value="75"
         />`),
-        [{
+        [{roleParents: [],
           role: "progressbar", label: "percent loaded", content: "", state: 75,
         }]
       );

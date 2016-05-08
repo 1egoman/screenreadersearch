@@ -52,6 +52,18 @@ function synonymize(posInput) {
     function format(types) {
       return [...types.syn, word];
     }
+
+    // take all of the contents reterned by the thesaurus and flatten
+    function unionWordTypes(types) {
+      if (types) {
+        let all = [];
+        if (types.syn) all = [...all, ...types.syn]
+        if (types.sim) all = [...all, ...types.sim]
+        return all;
+      } else {
+        return [];
+      }
+    }
     
     return syn.lookup(word)
     .then(data => {
@@ -63,9 +75,9 @@ function synonymize(posInput) {
         case 'JJ': return format(data.adjective);
         default:
           return format({syn: [
-            ...(data.noun ? data.noun.syn : []),
-            ...(data.verb ? data.verb.syn : []),
-            ...(data.adjective ? data.adjective.syn : []),
+            ...unionWordTypes(data.noun),
+            ...unionWordTypes(data.verb),
+            ...unionWordTypes(data.adjective),
           ]});
       }
     });

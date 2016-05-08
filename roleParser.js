@@ -38,6 +38,32 @@ const selectors = {
   ],
 };
 
+// given a string, strip runs of whitespace to format the content in a better
+// fashion
+function stripWhitespace(content) {
+  let total = "", whitespaceStreak = 0;
+  content.split('').reduce((last, current) => {
+    // if the current and last are both whitespace, then don't continue adding
+    // whitespace
+    if (
+      ( last === " " || last === "\n" ) &&
+      ( current === " " || current === "\n" )
+    ) {
+      whitespaceStreak++;
+    } else {
+      whitespaceStreak = 0;
+    }
+
+    if (whitespaceStreak < 1) {
+      total += current;
+    }
+
+    return current;
+  }, '');
+
+  return total;
+}
+
 // Input: a html string
 // Output: a list of actionable elements with their relevant labels.
 module.exports = function roleParser(layout) {
@@ -72,15 +98,15 @@ module.exports = function roleParser(layout) {
       if (nodeReferencedLabel.length > 0) {
         return nodeReferencedLabel;
       } else {
-        return getLabelFromId(node[0]);
+        return getLabelFromKey(node[0], "id");
       }
     }
 
     // try to split the id with punctuation to make a more human readable
     // form.
-    function getLabelFromId(node) {
-      if (node.attribs.id) {
-        return node.attribs.id
+    function getLabelFromKey(node, key) {
+      if (node.attribs[key]) {
+        return node.attribs[key]
         .split(/[!#$%&()*+, \-./:;<=>?@ \\\^_`{|}~]/)
         .filter(c => c.trim().length > 0)
         .join(" ");
@@ -116,7 +142,10 @@ module.exports = function roleParser(layout) {
         };
       }
     } else {
-      return {nodeContent, label: getLabelFromId(node)}; // as a last resort, look for the label within the id
+      return {
+        nodeContent,
+        label: getLabelFromKey(node, "id") || getLabelFromKey(node, "value"),
+      }; // as a last resort, look for the label within the id
     }
   }
 
@@ -140,6 +169,23 @@ module.exports = function roleParser(layout) {
     }
   }
 
+  // get the roles that this element is contained underneath
+  function getNodeRoleParents(node, acc) {
+    acc = acc || [];
+    if (node.parent) {
+      let role = node.parent.attribs.role;
+      if (role) {
+        return getNodeRoleParents(node.parent, [...acc, role]);
+      } else {
+        return getNodeRoleParents(node.parent, acc);
+      }
+    } else {
+      return acc;
+    }
+    console.log(node.parent)
+    return node;
+  }
+
 
   // for each role, try and find matches
   let data = [];
@@ -153,10 +199,11 @@ module.exports = function roleParser(layout) {
         // return each node's data
         return {
           role, // the input type
-          content: content.nodeContent,
+          roleParents: getNodeRoleParents(node),
+          content: stripWhitespace(content.nodeContent),
 
           // the text label for the element
-          label: content.label || content.nodeContent,
+          label: stripWhitespace(content.label || content.nodeContent),
 
           // the present condition of te element
           state: getNodeState(node),
