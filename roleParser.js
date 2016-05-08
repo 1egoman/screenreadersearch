@@ -174,6 +174,10 @@ module.exports = function roleParser(layout) {
     acc = acc || [];
     if (node.parent) {
       let role = node.parent.attribs.role;
+      if (role && node.parent.attribs.id) {
+        role = `${role}#${node.parent.attribs.id.split(" ").join("#")}`;
+      }
+
       if (role) {
         return getNodeRoleParents(node.parent, [...acc, role]);
       } else {
@@ -182,7 +186,6 @@ module.exports = function roleParser(layout) {
     } else {
       return acc;
     }
-    console.log(node.parent)
     return node;
   }
 

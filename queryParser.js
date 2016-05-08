@@ -101,7 +101,7 @@ function matchPortion(dict, query, matches, nonMatches) {
   } else if (dict.length === 0) {
     // we're done - compute percentage of match
     return matches / (nonMatches + matches);
-  } else if (dict[0].some(i => query.indexOf(i) >= 0)) { // match found
+  } else if (dict[0].some(i => ` ${query} `.indexOf(` ${i} `) >= 0)) { // match found
     return matchPortion(dict.slice(1), query, ++matches, nonMatches);
   } else { // no match found
     return matchPortion(dict.slice(1), query, matches, ++nonMatches);
