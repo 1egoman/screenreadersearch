@@ -1,0 +1,7 @@
+- App starts with user input in text form, and a base url
+  - fetch that url
+  - look for "action buttons" on that page with screenreader stuff to guide
+  - for each:
+    - fake a "click" on those buttons, and watch for dom changes.
+    - in the changed dom, look for input places and buttons that are relevant.
+  - return all the potential action's data to the frontend
