@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --compilers js:sinon-as-promised"
+    "test": "mocha --compilers js:sinon-as-promised",
+    "cover": "istanbul cover _mocha -- --compilers js:sinon-as-promised",
+    "report": "google-chrome coverage/lcov-report/index.html"
   },
   "author": "",
   "license": "ISC",
