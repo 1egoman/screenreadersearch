@@ -72,7 +72,6 @@ function synonymize(posInput) {
   return Promise.all(words);
 }
 
-// function doesStringMatchQuery(dict, query) {
 // Step 4: does the given string match a query or its synonyms?
 // We want to see if a given list of word synonyms matches up with a search
 // query. So, for each word, check if it is contained in the query. Return a
@@ -97,6 +96,7 @@ function matchPortion(dict, query, matches, nonMatches) {
 
 module.exports = {
   tokenize,
+  classify,
   synonymize,
   matchPortion,
 }
