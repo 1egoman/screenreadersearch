@@ -23,6 +23,7 @@ function fillInRole(data) {
 describe("integration", function() {
   this.slow(500);
 
+  // silence console.info logging
   let consoleinfo;
   before(() => {
     consoleinfo = console.info;
@@ -121,49 +122,74 @@ describe("integration", function() {
     it("create tweet", function() {
       return algorithm(twitterHTML, "create tweet").then(out => {
         assert.deepEqual(out, [
-            { role: 'button',
-              roleParents: [ 'complementary' ],
-              content: 'Tweet',
-              label: 'global new tweet button',
-              state: undefined },
+          { role: 'button',
+            roleParents: [ 'complementary' ],
+            content: 'Tweet',
+            label: 'global new tweet button',
+            state: undefined },
 
-            { role: 'button',
-              roleParents: [],
-              content: 'New Message',
-              label: 'New Message',
-              state: undefined
-            },
-            { role: 'button',
-              roleParents: [],
-              content: 'Remove Tweet attachment',
-              label: 'Remove Tweet attachment',
-              state: undefined
-            },
-            { role: 'button',
-              roleParents: [],
-              content: 'Next Tweet from user',
-              label: 'Next Tweet from user',
-              state: undefined
-            },
-            { role: 'checkbox',
-              roleParents: [],
-              content: '',
-              label: 'include parent tweet',
-              state: undefined
-            },
-            { role: 'textbox',
-              roleParents: [],
-              content: '',
-              label: 'Tweet text',
-              state: undefined 
-            },
-            { role: 'textbox',
-              roleParents: [],
-              content: '',
-              label: 'Tweet text',
-              state: undefined 
-            } 
+          { role: 'button',
+            roleParents: [],
+            content: 'New Message',
+            label: 'New Message',
+            state: undefined
+          },
+          { role: 'button',
+            roleParents: [],
+            content: 'Remove Tweet attachment',
+            label: 'Remove Tweet attachment',
+            state: undefined
+          },
+          { role: 'button',
+            roleParents: [],
+            content: 'Next Tweet from user',
+            label: 'Next Tweet from user',
+            state: undefined
+          },
+          { role: 'checkbox',
+            roleParents: [],
+            content: '',
+            label: 'include parent tweet',
+            state: undefined
+          },
+          { role: 'textbox',
+            roleParents: [],
+            content: '',
+            label: 'Tweet text',
+            state: undefined 
+          },
+          { role: 'textbox',
+            roleParents: [],
+            content: '',
+            label: 'Tweet text',
+            state: undefined 
+          } 
         ]);
+      });
+    });
+  });
+  describe("goodsite", function() {
+    let goodsiteHTML;
+    before(() => goodsiteHTML = getHTMLCase("goodsite"));
+
+    // stub the synonyms
+    beforeEach(() => {
+      let lookup = sinon.stub(Synonymator.prototype, "lookup");
+      lookup.withArgs("add").resolves({verb: {syn: ["create", "new"]}});
+      lookup.withArgs("thing").resolves({verb: {syn: ["item", "content"]}});
+      lookup.rejects("Bad query synonym word");
+    });
+    afterEach(() => {
+      Synonymator.prototype.lookup.restore();
+    });
+
+    it("add thing", function() {
+      return algorithm(goodsiteHTML, "add thing").then(out => {
+        assert.deepEqual(out, [fillInRole({
+          role: 'textbox',
+          label: 'Add a thing mommy does on mommy\'s day',
+          state: undefined,
+        })]);
       });
     });
   });

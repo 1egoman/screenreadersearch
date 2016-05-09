@@ -71,7 +71,9 @@ function synonymize(posInput) {
         case 'NN':
         case 'N':
           return format(data.noun);
-        case 'VB': return format(data.verb);
+        case 'VB':
+        case 'VBG':
+          return format(data.verb);
         case 'JJ': return format(data.adjective);
         default:
           return format({syn: [
