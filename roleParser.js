@@ -32,9 +32,14 @@ const selectors = {
   textbox: [
     "[role=textbox]",
     "input[type=text]",
+    "input[type=password]",
+    "input[type=email]",
   ],
   progressbar: [
     "[role=progressbar]",
+  ],
+  link: [
+    "a[href]",
   ],
 };
 
@@ -144,7 +149,9 @@ module.exports = function roleParser(layout) {
     } else {
       return {
         nodeContent,
-        label: getLabelFromKey(node, "id") || getLabelFromKey(node, "value"),
+        label: getLabelFromKey(node, "placeholder") ||
+               getLabelFromKey(node, "id") ||
+               getLabelFromKey(node, "value"),
       }; // as a last resort, look for the label within the id
     }
   }
@@ -163,6 +170,7 @@ module.exports = function roleParser(layout) {
     } else {
       return attr.checked ||
              attr.value ||
+             attr.href ||
              attr["aria-pressed"] ||
              attr["aria-checked"] ||
              attr["aria-selected"];
@@ -198,6 +206,7 @@ module.exports = function roleParser(layout) {
       let output = $(selector).toArray().map(node => {
         // get the text associated with a node
         let content = getNodeDescriptor(node);
+        role === "textbox" && console.info("NODE", node.attribs);
 
         // return each node's data
         return {

@@ -1,14 +1,28 @@
 "use strict";
 const algorithm = require("./algorithmEnter"),
-      request = require("request-promise");
+      request = require("request-promise"),
 
-let query = "google search";
+      express = require("express"),
+      app = express();
 
-request({
-  method: "GET",
-  url: "http://google.com",
-}).then(data => {
-  return algorithm(data, query)
-})
-.then(a => console.log(a))
-.catch(e => e.stack ? console.error(e.stack) : console.error(e));
+// ejs templates
+app.set('view engine', 'ejs');
+
+app.get("/search", (req, res) => {
+  request({
+    method: "GET",
+    url: req.query.site,
+  }).then(data => {
+    return algorithm(data, req.query.q)
+  })
+  .then(actions => {
+    res.render("search", {data: {
+      query: req.query.q,
+      domain: req.query.site,
+      actions,
+    }});
+  })
+  .catch(e => e.stack ? res.send(e.stack) : res.send(e));
+});
+
+app.listen(process.env.PORT || 8000);

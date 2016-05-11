@@ -1,0 +1,26 @@
+<style>
+li {
+  padding: 20px;
+  border: 2px solid #ccc;
+  list-style: none;
+}
+</style>
+
+<%- data.actions.map(action => {
+  val = (function() {
+    switch (action.role) {
+      case "button":
+        return `<button>${action.label}</button>`;
+      case "checkbox":
+        return `<input type="checkbox" /><label>${action.label}</label>`;
+      case "textbox":
+        return `<input placeholder="${action.label}" type="text" value="${action.contents || ''}" />`;
+      default:
+        return action.label || action.contents;
+    }
+  })();
+
+  return `<li>${val}</li>`;
+}); %>
+
+<pre><%= JSON.stringify(data, null, 2) %></pre>

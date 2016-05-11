@@ -12,7 +12,10 @@
   "license": "ISC",
   "dependencies": {
     "bluebird": "^3.3.5",
+    "ejs": "^2.4.1",
+    "express": "^4.13.4",
     "natural": "^0.4.0",
+    "request": "^2.72.0",
     "request-promise": "^3.0.0",
     "synonymator": "0.0.1"
   },
